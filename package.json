@@ -1,0 +1,21 @@
+{
+  "name": "poll-parser-bot",
+  "version": "1.0.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node --env-file=.env dist/main.js",
+    "build": "tsc",
+    "debug": "yarn build && yarn start",
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "telegraf": "^4.16.3",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0"
+  }
+}
