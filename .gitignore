@@ -2,3 +2,5 @@
 node_modules
 dist
 .vscode
+mysql_data
+/prisma/generated/prisma
