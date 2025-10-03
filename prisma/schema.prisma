@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id                Int               @id
+  id                BigInt            @id
   is_bot            Boolean?
   first_name        String
   last_name         String?
@@ -27,17 +27,17 @@ model User {
 }
 
 model UserPollOptions {
-  id        Int         @id @default(autoincrement())
+  id        BigInt      @id @default(autoincrement())
   option    PollOption? @relation(fields: [option_id], references: [id])
   user      User?       @relation(fields: [user_id], references: [id])
-  option_id Int?
-  user_id   Int?
+  option_id BigInt?
+  user_id   BigInt?
 
   @@index([option_id, user_id])
 }
 
 model PollOption {
-  id                Int               @id @default(autoincrement())
+  id                BigInt            @id @default(autoincrement())
   text              String
   voter_count       Int
   poll              Poll              @relation(fields: [poll_id], references: [id])
@@ -46,10 +46,11 @@ model PollOption {
 }
 
 model Poll {
-  id        String       @id
-  question  String
-  type      String
-  options   PollOption[]
-  author    User         @relation(fields: [author_id], references: [id])
-  author_id Int
+  id                      String       @id
+  question                String
+  type                    String
+  allows_multiple_answers Boolean
+  options                 PollOption[]
+  author                  User         @relation(fields: [author_id], references: [id])
+  author_id               BigInt
 }

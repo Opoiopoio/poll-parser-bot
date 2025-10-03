@@ -1,1 +1,2 @@
-export * from './poll-statistic.scene'
+export * from './poll-info.scene'
+export * from './create-poll.scene'
