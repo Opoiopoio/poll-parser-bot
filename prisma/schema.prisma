@@ -46,10 +46,10 @@ model PollOption {
 }
 
 model Poll {
-  id       String       @id
-  question String
-  type     String
-  options  PollOption[]
-  author   User         @relation(fields: [userId], references: [id])
-  userId   Int
+  id        String       @id
+  question  String
+  type      String
+  options   PollOption[]
+  author    User         @relation(fields: [author_id], references: [id])
+  author_id Int
 }
