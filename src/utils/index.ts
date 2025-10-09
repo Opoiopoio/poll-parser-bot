@@ -1,6 +1,7 @@
 import { Context, NarrowedContext } from 'telegraf'
 import { Update, Message, Poll } from 'telegraf/types'
 export * from './data-validation.facade'
+export * from './inline-keyboard'
 
 type PollUpdate =
   | Update.PollUpdate

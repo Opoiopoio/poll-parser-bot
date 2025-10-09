@@ -2,7 +2,7 @@ import { Update } from 'telegraf/types'
 import { NarrowedContext } from 'telegraf'
 import { BaseScene, SceneContext, SceneSessionData } from 'telegraf/scenes'
 
-import { extractPoll } from '../utils'
+import { extractPoll, inlineKeyboard } from '../utils'
 import { DataSource } from '../data-source/data-source'
 
 export class CreatePollScene extends BaseScene<SceneContext> {
@@ -46,10 +46,13 @@ export class CreatePollScene extends BaseScene<SceneContext> {
         }
       })
 
-      await ctx.reply('Теперь перешлите опрос в другой чат для сбора голосов')
+      await ctx.reply(
+        'Теперь перешлите опрос в другой чат для сбора голосов',
+        inlineKeyboard
+      )
       await ctx.scene.leave()
     } catch (error) {
-      await ctx.reply('Ошибка при обработке команды...')
+      await ctx.reply('Ошибка при обработке команды...', inlineKeyboard)
       await ctx.scene.leave()
       console.error(error)
     }

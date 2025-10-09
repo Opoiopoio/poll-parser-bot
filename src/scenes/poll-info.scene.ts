@@ -3,6 +3,7 @@ import { NarrowedContext } from 'telegraf'
 import { Message, Poll, Update } from 'telegraf/types'
 import { User } from '../../prisma/generated/prisma'
 import { DataSource } from '../data-source'
+import { inlineKeyboard } from '../utils'
 
 type BaseMsgContext<TMsg extends Message = Message> = NarrowedContext<
   SceneContext<SceneSessionData>,
@@ -36,7 +37,7 @@ export class PollInfoScene extends BaseScene<SceneContext> {
   private handleMessage = async (ctx: PartialMsgContext) => {
     console.log('message', ctx)
     if (!this.isFullMessage(ctx)) {
-      await ctx.reply('Вы прислали не опрос')
+      await ctx.reply('Вы прислали не опрос', inlineKeyboard)
       ctx.scene.leave()
       return
     }
@@ -48,7 +49,7 @@ export class PollInfoScene extends BaseScene<SceneContext> {
     poll: AsyncReturnType<typeof this.dataSource.readyQueries.poll.get>
   ) {
     if (!poll) {
-      await ctx.reply('Нет статистики по опросу...')
+      await ctx.reply('Нет статистики по опросу...', inlineKeyboard)
       return ctx.scene.leave()
     }
     if (
@@ -57,7 +58,14 @@ export class PollInfoScene extends BaseScene<SceneContext> {
         o.user_poll_options.some((upo) => upo.user_id === BigInt(ctx.from.id))
       )
     ) {
-      await ctx.reply('Вы не являетесь автором или проголосовавшим')
+      await ctx.reply(
+        'Вы не являетесь автором или проголосовавшим',
+        inlineKeyboard
+      )
+      return ctx.scene.leave()
+    }
+    if (poll.options.every((o) => !o.user_poll_options.length)) {
+      await ctx.reply('Проголосовавших нет', inlineKeyboard)
       return ctx.scene.leave()
     }
     return poll
@@ -72,6 +80,7 @@ export class PollInfoScene extends BaseScene<SceneContext> {
       if (!poll) return
 
       const result = poll.options
+        .filter((o) => !!o.user_poll_options.length)
         .map(
           (o, i) =>
             `Проголосовали за пункт: ${o?.text ?? i + 1}\n${o.user_poll_options
@@ -80,12 +89,12 @@ export class PollInfoScene extends BaseScene<SceneContext> {
         )
         .join('\n\n')
 
-      await ctx.reply(result)
+      await ctx.reply(result, inlineKeyboard)
       await ctx.scene.leave()
     } catch (error) {
-      await ctx.reply('Ошибка при обработке команды...')
-      await ctx.scene.leave()
       console.log(error)
+      await ctx.reply('Ошибка при обработке команды...', inlineKeyboard)
+      await ctx.scene.leave()
     }
   }
 
