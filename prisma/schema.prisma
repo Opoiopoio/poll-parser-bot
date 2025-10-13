@@ -45,12 +45,20 @@ model PollOption {
   user_poll_options UserPollOptions[]
 }
 
+model PollStatisticMessage {
+  id      BigInt @id
+  poll    Poll   @relation(fields: [poll_id], references: [id])
+  poll_id String
+  chat_id BigInt
+}
+
 model Poll {
-  id                      String       @id
+  id                      String                 @id
   question                String
   type                    String
   allows_multiple_answers Boolean
   options                 PollOption[]
-  author                  User         @relation(fields: [author_id], references: [id])
+  author                  User                   @relation(fields: [author_id], references: [id])
   author_id               BigInt
+  PollStatisticMessage    PollStatisticMessage[]
 }

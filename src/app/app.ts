@@ -3,10 +3,14 @@ import { SceneContext, SceneSessionData, Stage } from 'telegraf/scenes'
 import { DataSource } from '../data-source'
 import { CreatePollScene, PollInfoScene } from '../scenes'
 import { ActionHandler, CommandsHandler, PollAnswerHandler } from '../handlers'
+import { StatisticService } from '../service'
+import { DataValidationFacade } from '../utils'
 
 export class App {
   public readonly dataSource = new DataSource()
   public readonly bot: Telegraf<SceneContext<SceneSessionData>>
+  public readonly staticService = new StatisticService()
+  public readonly validation: DataValidationFacade
   private readonly _commandHandler: CommandsHandler
   private readonly _actionHandler: ActionHandler
 
@@ -18,13 +22,14 @@ export class App {
       { command: 'create_poll', description: 'Новый опрос' },
       { command: 'poll_info', description: 'Статистика опроса' }
     ])
+    this.validation = new DataValidationFacade(this.dataSource.prisma)
     this._commandHandler = new CommandsHandler(this.bot)
     this._actionHandler = new ActionHandler(this.bot)
   }
 
   async init() {
-    const pollStatisticScene = new PollInfoScene(this.dataSource)
-    const createPollScene = new CreatePollScene(this.dataSource)
+    const pollStatisticScene = new PollInfoScene(this)
+    const createPollScene = new CreatePollScene(this)
     const stage = new Stage([pollStatisticScene, createPollScene])
 
     this.bot.use(session())
@@ -38,7 +43,7 @@ export class App {
   private initHandlers() {
     this._commandHandler.init()
     this._actionHandler.init()
-    const pollAnswerHandler = new PollAnswerHandler(this.dataSource)
+    const pollAnswerHandler = new PollAnswerHandler(this)
     this.bot.on('poll_answer', pollAnswerHandler.invoke)
   }
 

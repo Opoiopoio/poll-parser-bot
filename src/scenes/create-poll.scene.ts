@@ -3,10 +3,10 @@ import { NarrowedContext } from 'telegraf'
 import { BaseScene, SceneContext, SceneSessionData } from 'telegraf/scenes'
 
 import { extractPoll, inlineKeyboard } from '../utils'
-import { DataSource } from '../data-source/data-source'
+import { App } from '../app'
 
 export class CreatePollScene extends BaseScene<SceneContext> {
-  constructor(private readonly source: DataSource) {
+  constructor(private readonly app: App) {
     super(CreatePollScene.name)
 
     this.enter(this.handleEnter)
@@ -25,7 +25,7 @@ export class CreatePollScene extends BaseScene<SceneContext> {
 
       const { poll } = pollCtx.message
       console.log('poll', poll)
-      await this.source.dataValidation.user.invoke(pollCtx.from)
+      await this.app.validation.user.invoke(pollCtx.from)
 
       const { options, question, type, allows_multiple_answers } = poll
 
@@ -35,7 +35,7 @@ export class CreatePollScene extends BaseScene<SceneContext> {
         { ...poll, is_anonymous: false }
       )
 
-      await this.source.prisma.poll.create({
+      await this.app.dataSource.prisma.poll.create({
         data: {
           id: msg.poll.id,
           question,
@@ -43,6 +43,17 @@ export class CreatePollScene extends BaseScene<SceneContext> {
           allows_multiple_answers,
           author_id: pollCtx.from.id,
           options: { create: options }
+        }
+      })
+
+      const statisticMsg = await ctx.reply(
+        'В этом сообщении будет отображаться статистика по опросу'
+      )
+      await this.app.dataSource.prisma.pollStatisticMessage.create({
+        data: {
+          id: statisticMsg.message_id,
+          poll_id: msg.poll.id,
+          chat_id: statisticMsg.chat.id
         }
       })
 

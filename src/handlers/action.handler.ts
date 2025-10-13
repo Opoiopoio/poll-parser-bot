@@ -6,11 +6,13 @@ export class ActionHandler {
   constructor(private readonly bot: Telegraf<SceneContext<SceneSessionData>>) {}
 
   init() {
-    this.bot.action('create_poll_btn', (ctx) =>
-      ctx.scene.enter(CreatePollScene.name)
-    )
-    this.bot.action('poll_info_btn', (ctx) =>
-      ctx.scene.enter(PollInfoScene.name)
-    )
+    this.bot.action('create_poll_btn', async (ctx) => {
+      await ctx.answerCbQuery()
+      await ctx.scene.enter(CreatePollScene.name)
+    })
+    this.bot.action('poll_info_btn', async (ctx) => {
+      await ctx.answerCbQuery()
+      await ctx.scene.enter(PollInfoScene.name)
+    })
   }
 }
