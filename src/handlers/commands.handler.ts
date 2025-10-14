@@ -1,6 +1,6 @@
-import { Context, Middleware, Telegraf } from 'telegraf'
+import { Telegraf } from 'telegraf'
 import { SceneContext, SceneSessionData } from 'telegraf/scenes'
-import { CreatePollScene, PollInfoScene } from '../scenes'
+import { CreatePollScene, PollInfoScene, UserSettingsScene } from '../scenes'
 import { inlineKeyboard } from '../utils'
 
 // const helpMessage =
@@ -29,6 +29,9 @@ export class CommandsHandler {
   init() {
     this.bot.start((ctx) =>
       ctx.replyWithMarkdownV2(helpMessage, inlineKeyboard)
+    )
+    this.bot.command('settings', (ctx) =>
+      ctx.scene.enter(UserSettingsScene.name)
     )
     this.bot.command('create_poll', (ctx) =>
       ctx.scene.enter(CreatePollScene.name)

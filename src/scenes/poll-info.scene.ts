@@ -1,12 +1,6 @@
 import { BaseScene, SceneContext, SceneSessionData } from 'telegraf/scenes'
 
-import { User } from '../../prisma/generated/prisma'
-import {
-  inlineKeyboard,
-  FindPollResult,
-  FullMsgContext,
-  PartialMsgContext
-} from '../utils'
+import { inlineKeyboard, FullMsgContext, PartialMsgContext } from '../utils'
 import { App } from '../app'
 
 export class PollInfoScene extends BaseScene<SceneContext> {
@@ -38,30 +32,36 @@ export class PollInfoScene extends BaseScene<SceneContext> {
     try {
       const id = ctx.message.poll.id
 
-      const statisticMsg =
-        await this.app.dataSource.prisma.pollStatisticMessage.findFirst({
-          where: { poll_id: id }
-        })
+      // const statisticMsg = await this.app.prisma.pollStatisticMessage.findFirst(
+      //   { where: { poll_id: id } }
+      // )
 
-      if (statisticMsg) {
-        await ctx.telegram.copyMessage(
-          ctx.chat.id,
-          Number(statisticMsg.chat_id),
-          Number(statisticMsg.id)
-        )
-        await ctx.reply('Выберите следующее действие', inlineKeyboard)
-        return await ctx.scene.leave()
-      }
+      // if (statisticMsg) {
+      //   await ctx.telegram.copyMessage(
+      //     ctx.chat.id,
+      //     Number(statisticMsg.chat_id),
+      //     Number(statisticMsg.id)
+      //   )
+      //   await ctx.reply('Выберите следующее действие', inlineKeyboard)
+      //   return await ctx.scene.leave()
+      // }
 
-      const poll = await this.app.dataSource.readyQueries.poll.get(id)
+      const poll = await this.app.readyQueries.poll.get(id)
+      const userSettings = await this.app.readyQueries.userSettings.getByUserId(
+        ctx.from.id
+      )
+
       const validationResult = this.app.validation.poll.invoke(ctx, poll)
       const result =
         typeof validationResult === 'string'
           ? validationResult
-          : this.app.staticService.get(validationResult)
+          : this.app.staticService.get(
+              validationResult,
+              userSettings.statistic_format
+            )
 
       const msg = await ctx.replyWithHTML(result, inlineKeyboard)
-      await this.app.dataSource.prisma.pollStatisticMessage.create({
+      await this.app.prisma.pollStatisticMessage.create({
         data: { chat_id: ctx.chat.id, id: msg.message_id, poll_id: id }
       })
       await ctx.scene.leave()

@@ -12,21 +12,21 @@ export class PollAnswerHandler implements IHandler<PollContext> {
       const { user, poll_id, option_ids } = ctx.pollAnswer
       await this.app.validation.user.invoke(user)
 
-      const poll = await this.app.dataSource.prisma.poll.findFirst({
+      const poll = await this.app.prisma.poll.findFirst({
         where: { id: poll_id },
         include: { options: true }
       })
       if (!poll) return
 
-      await this.app.dataSource.prisma.$transaction(async () => {
-        await this.app.dataSource.prisma.userPollOptions.deleteMany({
+      await this.app.prisma.$transaction(async () => {
+        await this.app.prisma.userPollOptions.deleteMany({
           where: { user_id: user.id, option: { poll_id } }
         })
 
         const promises = poll.options
           .filter((_, i) => option_ids.includes(i))
           .map((o) =>
-            this.app.dataSource.prisma.userPollOptions.create({
+            this.app.prisma.userPollOptions.create({
               data: { user_id: user.id, option_id: o.id }
             })
           )
@@ -41,18 +41,23 @@ export class PollAnswerHandler implements IHandler<PollContext> {
   }
 
   private async updateStatisticMessage(ctx: PollContext, id: string) {
-    const statisticMsg =
-      await this.app.dataSource.prisma.pollStatisticMessage.findFirst({
-        where: { poll_id: id }
-      })
-    const poll = await this.app.dataSource.readyQueries.poll.get(id)
+    const statisticMsg = await this.app.prisma.pollStatisticMessage.findFirst({
+      where: { poll_id: id }
+    })
+    const poll = await this.app.readyQueries.poll.get(id)
     if (!statisticMsg || !poll) return
 
+    const userSettings = await this.app.readyQueries.userSettings.getByUserId(
+      ctx.from.id
+    )
     const validationResult = this.app.validation.poll.invoke(ctx, poll)
     const newMsg =
       typeof validationResult === 'string'
         ? validationResult
-        : this.app.staticService.get(validationResult)
+        : this.app.staticService.get(
+            validationResult,
+            userSettings.statistic_format
+          )
 
     await this.app.bot.telegram.editMessageText(
       Number(statisticMsg.chat_id),

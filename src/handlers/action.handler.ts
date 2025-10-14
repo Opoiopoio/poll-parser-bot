@@ -8,10 +8,12 @@ export class ActionHandler {
   init() {
     this.bot.action('create_poll_btn', async (ctx) => {
       await ctx.answerCbQuery()
+      await ctx.scene.leave()
       await ctx.scene.enter(CreatePollScene.name)
     })
     this.bot.action('poll_info_btn', async (ctx) => {
       await ctx.answerCbQuery()
+      await ctx.scene.leave()
       await ctx.scene.enter(PollInfoScene.name)
     })
   }

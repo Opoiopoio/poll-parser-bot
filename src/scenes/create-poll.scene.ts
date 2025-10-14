@@ -35,7 +35,7 @@ export class CreatePollScene extends BaseScene<SceneContext> {
         { ...poll, is_anonymous: false }
       )
 
-      await this.app.dataSource.prisma.poll.create({
+      await this.app.prisma.poll.create({
         data: {
           id: msg.poll.id,
           question,
@@ -49,7 +49,7 @@ export class CreatePollScene extends BaseScene<SceneContext> {
       const statisticMsg = await ctx.reply(
         'В этом сообщении будет отображаться статистика по опросу'
       )
-      await this.app.dataSource.prisma.pollStatisticMessage.create({
+      await this.app.prisma.pollStatisticMessage.create({
         data: {
           id: statisticMsg.message_id,
           poll_id: msg.poll.id,

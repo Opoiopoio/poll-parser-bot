@@ -24,6 +24,14 @@ model User {
   is_premium        Boolean?
   polls             Poll[]
   user_poll_options UserPollOptions[]
+  settings          UserSettings?
+}
+
+model UserSettings {
+  id               BigInt @id @default(autoincrement())
+  user             User   @relation(fields: [user_id], references: [id])
+  user_id          BigInt @unique
+  statistic_format String @default("tag")
 }
 
 model UserPollOptions {

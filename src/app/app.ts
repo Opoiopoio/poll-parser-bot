@@ -1,13 +1,15 @@
 import { session, Telegraf } from 'telegraf'
 import { SceneContext, SceneSessionData, Stage } from 'telegraf/scenes'
-import { DataSource } from '../data-source'
-import { CreatePollScene, PollInfoScene } from '../scenes'
+import { CreatePollScene, PollInfoScene, UserSettingsScene } from '../scenes'
 import { ActionHandler, CommandsHandler, PollAnswerHandler } from '../handlers'
 import { StatisticService } from '../service'
 import { DataValidationFacade } from '../utils'
+import { PrismaClient } from '../../prisma/generated/prisma'
+import { ReadyQueries } from '../data-source'
 
 export class App {
-  public readonly dataSource = new DataSource()
+  public readonly prisma = new PrismaClient()
+  public readonly readyQueries: ReadyQueries
   public readonly bot: Telegraf<SceneContext<SceneSessionData>>
   public readonly staticService = new StatisticService()
   public readonly validation: DataValidationFacade
@@ -19,10 +21,12 @@ export class App {
     this.bot.telegram.setMyCommands([
       { command: 'start', description: 'Запустить бота' },
       { command: 'help', description: 'Помощь' },
+      { command: 'settings', description: 'Настройки' },
       { command: 'create_poll', description: 'Новый опрос' },
       { command: 'poll_info', description: 'Статистика опроса' }
     ])
-    this.validation = new DataValidationFacade(this.dataSource.prisma)
+    this.readyQueries = new ReadyQueries(this.prisma)
+    this.validation = new DataValidationFacade(this.prisma)
     this._commandHandler = new CommandsHandler(this.bot)
     this._actionHandler = new ActionHandler(this.bot)
   }
@@ -30,13 +34,18 @@ export class App {
   async init() {
     const pollStatisticScene = new PollInfoScene(this)
     const createPollScene = new CreatePollScene(this)
-    const stage = new Stage([pollStatisticScene, createPollScene])
+    const userSettingsScene = new UserSettingsScene(this)
+    const stage = new Stage([
+      pollStatisticScene,
+      createPollScene,
+      userSettingsScene
+    ])
 
     this.bot.use(session())
     this.bot.use(stage.middleware())
     this.initHandlers()
 
-    await this.dataSource.prisma.$connect()
+    await this.prisma.$connect()
     await this.bot.launch(() => console.log('Бот запущен!'))
   }
 
@@ -48,7 +57,7 @@ export class App {
   }
 
   async destroy(reason?: string) {
-    await this.dataSource.prisma.$disconnect()
+    await this.prisma.$disconnect()
     this.bot.stop(reason)
   }
 }
