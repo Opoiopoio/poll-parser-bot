@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "main": "dist/main.js",
   "scripts": {
-    "start": "node --env-file=.env dist/main.js",
+    "start": "node dist/main.js",
     "build": "tsc",
-    "debug": "yarn build && yarn start",
-    "test": "test"
+    "debug": "yarn build && yarn node --env-file=.env dist/main.js",
+    "test": "test",
+    "prisma": "prisma"
   },
   "author": "",
   "license": "ISC",

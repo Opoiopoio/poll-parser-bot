@@ -1,16 +1,30 @@
 services:
+  app:
+    build: 
+      context: .
+      args:
+        - DATABASE_URL=mysql://root:${MYSQL_ROOT_PASSWORD}@db:3306/${MYSQL_DATABASE}
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DATABASE_URL=mysql://root:${MYSQL_ROOT_PASSWORD}@db:3306/${MYSQL_DATABASE}
+    networks:
+      - app-network
+
   db:
     image: mysql:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 123123
-      MYSQL_DATABASE: poll-parser-db
-      MYSQL_USER: poll-parser
-      MYSQL_PASSWORD: 123321
-    volumes:
-      - ./mysql_data:/var/lib/mysql
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - '3306:3306'
+    networks:
+      - app-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -19,6 +33,10 @@ services:
       - db
     environment:
       PMA_HOST: db
-      MYSQL_ROOT_PASSWORD: 123123
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - '8080:80'
+
+networks:
+  app-network:
+    driver: bridge
