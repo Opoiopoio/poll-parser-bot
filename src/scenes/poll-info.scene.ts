@@ -60,10 +60,10 @@ export class PollInfoScene extends BaseScene<SceneContext> {
               userSettings.statistic_format
             )
 
-      const msg = await ctx.replyWithHTML(result, inlineKeyboard)
-      await this.app.prisma.pollStatisticMessage.create({
-        data: { chat_id: ctx.chat.id, id: msg.message_id, poll_id: id }
-      })
+      await ctx.replyWithHTML(result, inlineKeyboard)
+      // await this.app.prisma.pollStatisticMessage.create({
+      //   data: { chat_id: ctx.chat.id, id: msg.message_id, poll_id: id }
+      // })
       await ctx.scene.leave()
     } catch (error) {
       console.log(error)
