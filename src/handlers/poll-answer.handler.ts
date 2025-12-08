@@ -1,9 +1,9 @@
+import { IApp } from '../app/IApp'
 import { IHandler } from './IHandler'
-import { App } from '../app'
 import { PollContext } from '../utils'
 
 export class PollAnswerHandler implements IHandler<PollContext> {
-  constructor(private readonly app: App) {}
+  constructor(private readonly app: IApp) {}
 
   public invoke = async (ctx: PollContext) => {
     try {
@@ -27,7 +27,7 @@ export class PollAnswerHandler implements IHandler<PollContext> {
           .filter((_, i) => option_ids.includes(i))
           .map((o) =>
             this.app.prisma.userPollOptions.create({
-              data: { user_id: user.id, option_id: o.id }
+              data: { user_id: user.id, option_id: o.id, createdAt: new Date() }
             })
           )
 

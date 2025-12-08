@@ -6,8 +6,9 @@ import { StatisticService } from '../service'
 import { DataValidationFacade } from '../utils'
 import { PrismaClient } from '../../prisma/generated/prisma'
 import { ReadyQueries } from '../data-source'
+import { IApp } from './IApp'
 
-export class App {
+export class App implements IApp {
   public readonly prisma = new PrismaClient()
   public readonly readyQueries: ReadyQueries
   public readonly bot: Telegraf<SceneContext<SceneSessionData>>

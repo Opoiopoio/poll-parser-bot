@@ -10,8 +10,6 @@ services:
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
       - DATABASE_URL=mysql://root:${MYSQL_ROOT_PASSWORD}@${MYSQL_HOST}:3306/${MYSQL_DATABASE}
-    networks:
-      - app-network
 
   db:
     image: mysql:latest
@@ -23,8 +21,6 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - '3306:3306'
-    networks:
-      - app-network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -36,7 +32,3 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - '8080:80'
-
-networks:
-  app-network:
-    driver: bridge

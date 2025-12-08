@@ -38,6 +38,7 @@ model UserPollOptions {
   id        BigInt      @id @default(autoincrement())
   option    PollOption? @relation(fields: [option_id], references: [id])
   user      User?       @relation(fields: [user_id], references: [id])
+  createdAt DateTime    @default(now())
   option_id BigInt?
   user_id   BigInt?
 

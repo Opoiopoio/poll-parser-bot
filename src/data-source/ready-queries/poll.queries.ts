@@ -7,7 +7,14 @@ export class PollQueries {
     return this.prisma.poll.findFirst({
       where: { id },
       include: {
-        options: { include: { user_poll_options: { include: { user: true } } } }
+        options: {
+          include: {
+            user_poll_options: {
+              include: { user: true },
+              orderBy: { createdAt: 'asc' }
+            }
+          }
+        }
       }
     })
   }

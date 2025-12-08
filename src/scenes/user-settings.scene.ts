@@ -1,7 +1,7 @@
 import { BaseScene, SceneContext, SceneSessionData } from 'telegraf/scenes'
 
-import { App } from '../app'
 import { Markup } from 'telegraf'
+import { IApp } from '../app/IApp'
 import { mainButtons } from '../utils'
 
 const statisticFormatQueueMap = new Map([
@@ -17,7 +17,7 @@ const statisticFormatTitleMap = new Map([
 ])
 
 export class UserSettingsScene extends BaseScene<SceneContext> {
-  constructor(private readonly app: App) {
+  constructor(private readonly app: IApp) {
     super(UserSettingsScene.name)
 
     this.enter(this.handleEnter)

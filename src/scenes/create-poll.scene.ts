@@ -3,10 +3,10 @@ import { NarrowedContext } from 'telegraf'
 import { BaseScene, SceneContext, SceneSessionData } from 'telegraf/scenes'
 
 import { extractPoll, inlineKeyboard } from '../utils'
-import { App } from '../app'
+import { IApp } from '../app/IApp'
 
 export class CreatePollScene extends BaseScene<SceneContext> {
-  constructor(private readonly app: App) {
+  constructor(private readonly app: IApp) {
     super(CreatePollScene.name)
 
     this.enter(this.handleEnter)
